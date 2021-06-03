@@ -8,6 +8,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
 <a name="unreleased"></a>
 ## [Unreleased]
 
+<a name="v1.0.1"></a>
+## [v1.0.1] - 2021-06-03
+
+Added
+- Added priority_count env variable for getting count.index in ansible
+
 <a name="v1.0.0"></a>
 ## [v1.0.0] - 2021-06-01
 

@@ -33,7 +33,7 @@ resource "null_resource" "provision_group_vars_templating" {
   provisioner "local-exec" {
     command = "envsubst < ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}.tpl > ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}"
 
-    environment = merge(var.environment_variables, { IP_ADDRESS = local.ip_list[count.index] })
+    environment = merge(var.environment_variables, { IP_ADDRESS = local.ip_list[count.index], priority_count = count.index })
   }
 }
 
