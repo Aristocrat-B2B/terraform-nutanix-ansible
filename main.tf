@@ -86,7 +86,9 @@ resource "null_resource" "provision_group_vars_setup" {
 }
 
 resource "random_string" "string" {
-  length = 5
+  length  = 5
+  special = false
+  number  = false
 }
 
 resource "null_resource" "provision_ansible_run" {
