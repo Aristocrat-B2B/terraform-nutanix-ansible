@@ -91,6 +91,7 @@ resource "null_resource" "provision_ansible_run" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.ssh_user}/${var.module_name}; echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root",
+      "mv /home/${var.ssh_user}/${var.module_name} mv /home/${var.ssh_user}/${var.module_name}-$RANDOM"
     ]
     connection {
       type     = "ssh"
