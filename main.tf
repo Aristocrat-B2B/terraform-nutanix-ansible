@@ -85,13 +85,17 @@ resource "null_resource" "provision_group_vars_setup" {
   }
 }
 
+resource "random_string" "string" {
+  length = 5
+}
+
 resource "null_resource" "provision_ansible_run" {
   depends_on = [local.group_var_setup_stat]
   count      = length(local.ip_list)
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.ssh_user}/${var.module_name}; echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root",
-      "mv /home/${var.ssh_user}/${var.module_name} mv /home/${var.ssh_user}/${var.module_name}-$RANDOM"
+      "mv /home/${var.ssh_user}/${var.module_name} /home/${var.ssh_user}/${var.module_name}-${random_string.string.result}"
     ]
     connection {
       type     = "ssh"
