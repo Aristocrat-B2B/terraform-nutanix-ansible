@@ -12,9 +12,9 @@ locals {
 resource "null_resource" "provision" {
   count = length(local.ip_list)
 
-  #  triggers = {
-  #    environment_variables = "${var.environment_variables}"
-  #  }
+  triggers = {
+    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+  }
 
   provisioner "remote-exec" {
     inline = ["echo '${var.message}'"]
@@ -31,9 +31,9 @@ resource "null_resource" "provision_group_vars_templating" {
   depends_on = [null_resource.provision]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
-  # triggers = {
-  #   environment_variables = "${var.environment_variables}"
-  # }
+  triggers = {
+    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+  }
 
   provisioner "local-exec" {
     command = "cp ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}.tpl ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}.tpl"
@@ -54,9 +54,9 @@ resource "null_resource" "provision_ansible_code_setup" {
   depends_on = [local.group_var_tpl_stat]
   count      = length(local.ip_list)
 
-  #triggers = {
-  #  environment_variables = "${var.environment_variables}"
-  #}
+  triggers = {
+    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -87,9 +87,9 @@ resource "null_resource" "provision_group_vars_setup" {
   depends_on = [null_resource.provision_ansible_code_setup]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
-  #triggers = {
-  #  environment_variables = "${var.environment_variables}"
-  #}
+  triggers = {
+    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -114,9 +114,9 @@ resource "null_resource" "provision_ansible_run" {
   depends_on = [local.group_var_setup_stat]
   count      = length(local.ip_list)
 
-  #triggers = {
-  #  environment_variables = "${var.environment_variables}"
-  #}
+  triggers = {
+    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+  }
 
   provisioner "remote-exec" {
     inline = [
