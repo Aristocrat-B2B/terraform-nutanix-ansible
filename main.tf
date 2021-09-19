@@ -12,7 +12,7 @@ locals {
 resource "null_resource" "provision" {
   count = length(local.ip_list)
 
-  triggers {
+  triggers = {
     environment_variables = var.environment_variables
   }
 
@@ -31,7 +31,7 @@ resource "null_resource" "provision_group_vars_templating" {
   depends_on = [null_resource.provision]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
-  triggers {
+  triggers = {
     environment_variables = var.environment_variables
   }
 
@@ -54,7 +54,7 @@ resource "null_resource" "provision_ansible_code_setup" {
   depends_on = [local.group_var_tpl_stat]
   count      = length(local.ip_list)
 
-  triggers {
+  triggers = {
     environment_variables = var.environment_variables
   }
 
@@ -87,7 +87,7 @@ resource "null_resource" "provision_group_vars_setup" {
   depends_on = [null_resource.provision_ansible_code_setup]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
-  triggers {
+  triggers = {
     environment_variables = var.environment_variables
   }
 
@@ -114,7 +114,7 @@ resource "null_resource" "provision_ansible_run" {
   depends_on = [local.group_var_setup_stat]
   count      = length(local.ip_list)
 
-  triggers {
+  triggers = {
     environment_variables = var.environment_variables
   }
 
