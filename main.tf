@@ -13,7 +13,7 @@ resource "null_resource" "provision" {
   count = length(local.ip_list)
 
   triggers = {
-    environment_variables = var.environment_variables
+    environment_variables = "${var.environment_variables}"
   }
 
   provisioner "remote-exec" {
@@ -32,7 +32,7 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    environment_variables = var.environment_variables
+    environment_variables = "${var.environment_variables}"
   }
 
   provisioner "local-exec" {
@@ -55,7 +55,7 @@ resource "null_resource" "provision_ansible_code_setup" {
   count      = length(local.ip_list)
 
   triggers = {
-    environment_variables = var.environment_variables
+    environment_variables = "${var.environment_variables}"
   }
 
   provisioner "remote-exec" {
@@ -88,7 +88,7 @@ resource "null_resource" "provision_group_vars_setup" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    environment_variables = var.environment_variables
+    environment_variables = "${var.environment_variables}"
   }
 
   provisioner "remote-exec" {
@@ -115,7 +115,7 @@ resource "null_resource" "provision_ansible_run" {
   count      = length(local.ip_list)
 
   triggers = {
-    environment_variables = var.environment_variables
+    environment_variables = "${var.environment_variables}"
   }
 
   provisioner "remote-exec" {
