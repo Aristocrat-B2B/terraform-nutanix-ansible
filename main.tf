@@ -12,6 +12,10 @@ locals {
 resource "null_resource" "provision" {
   count = length(local.ip_list)
 
+  triggers {
+    environment_variables = var.environment_variables
+  }
+
   provisioner "remote-exec" {
     inline = ["echo '${var.message}'"]
     connection {
@@ -26,6 +30,11 @@ resource "null_resource" "provision" {
 resource "null_resource" "provision_group_vars_templating" {
   depends_on = [null_resource.provision]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
+
+  triggers {
+    environment_variables = var.environment_variables
+  }
+
   provisioner "local-exec" {
     command = "cp ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}.tpl ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}.tpl"
   }
@@ -44,6 +53,11 @@ locals {
 resource "null_resource" "provision_ansible_code_setup" {
   depends_on = [local.group_var_tpl_stat]
   count      = length(local.ip_list)
+
+  triggers {
+    environment_variables = var.environment_variables
+  }
+
   provisioner "remote-exec" {
     inline = [
       "mkdir /home/${var.ssh_user}/${var.module_name}",
@@ -72,6 +86,11 @@ resource "null_resource" "provision_ansible_code_setup" {
 resource "null_resource" "provision_group_vars_setup" {
   depends_on = [null_resource.provision_ansible_code_setup]
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
+
+  triggers {
+    environment_variables = var.environment_variables
+  }
+
   provisioner "remote-exec" {
     inline = [
       "mv /home/${var.ssh_user}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index} /home/${var.ssh_user}/${var.module_name}/inventories/group_vars/${var.group_vars_name}",
@@ -94,6 +113,11 @@ resource "random_string" "string" {
 resource "null_resource" "provision_ansible_run" {
   depends_on = [local.group_var_setup_stat]
   count      = length(local.ip_list)
+
+  triggers {
+    environment_variables = var.environment_variables
+  }
+
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.ssh_user}/${var.module_name}; echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root",
