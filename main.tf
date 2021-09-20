@@ -36,7 +36,7 @@ resource "null_resource" "provision_group_vars_templating" {
 
   triggers = {
     vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.hosts_entries_join
+    hosts = local.host_entries_join
   }
 
   provisioner "local-exec" {
@@ -56,7 +56,7 @@ resource "null_resource" "provision_ansible_code_setup" {
 
   triggers = {
     vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.hosts_entries_join
+    hosts = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -90,7 +90,7 @@ resource "null_resource" "provision_group_vars_setup" {
 
   triggers = {
     vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.hosts_entries_join
+    hosts = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -118,7 +118,7 @@ resource "null_resource" "provision_ansible_run" {
 
   triggers = {
     vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.hosts_entries_join
+    hosts = local.host_entries_join
   }
 
   provisioner "remote-exec" {
