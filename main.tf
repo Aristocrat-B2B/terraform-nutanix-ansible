@@ -32,7 +32,8 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts = var.hosts_entries_join
   }
 
   provisioner "local-exec" {
