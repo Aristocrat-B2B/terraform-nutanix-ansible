@@ -61,6 +61,7 @@ resource "null_resource" "provision_ansible_code_setup" {
 
   provisioner "remote-exec" {
     inline = [
+      "rm -rf /home/${var.ssh_user}/${var.module_name}",
       "mkdir /home/${var.ssh_user}/${var.module_name}",
     ]
     connection {
@@ -124,6 +125,7 @@ resource "null_resource" "provision_ansible_run" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.ssh_user}/${var.module_name}; echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root",
+      "rm -rf /home/${var.ssh_user}/${var.module_name}-${random_string.string.result}",
       "mv /home/${var.ssh_user}/${var.module_name} /home/${var.ssh_user}/${var.module_name}-${random_string.string.result}"
     ]
     connection {
