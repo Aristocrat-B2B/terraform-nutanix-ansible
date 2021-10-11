@@ -8,6 +8,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 <a name="unreleased"></a>
 ## [Unreleased]
 
+<a name="v1.0.6"></a>
+## [v1.0.6] - 2021-10-11
+Changed
+- Ansible now deletes existing ansible code folder on module run`
+
 <a name="v1.0.5"></a>
 ## [v1.0.5] - 2021-06-08
 Added
