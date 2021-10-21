@@ -8,6 +8,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 <a name="unreleased"></a>
 ## [Unreleased]
 
+<a name="v1.0.7"></a>
+## [v1.0.7] - 2021-10-20
+Changed
+- Ansible now has runtime selection and random_num generator on every run`
+
 <a name="v1.0.6"></a>
 ## [v1.0.6] - 2021-10-11
 Changed

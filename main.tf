@@ -35,8 +35,9 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.host_entries_join
+    trigger_ansible = var.run_ansible ? "" : "${random_string.string.result}"
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
   }
 
   provisioner "local-exec" {
@@ -55,8 +56,9 @@ resource "null_resource" "provision_ansible_code_setup" {
   count      = length(local.ip_list)
 
   triggers = {
-    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.host_entries_join
+    trigger_ansible = var.run_ansible ? "" : "${random_string.string.result}"
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -90,8 +92,9 @@ resource "null_resource" "provision_group_vars_setup" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.host_entries_join
+    trigger_ansible = var.run_ansible ? "" : "${random_string.string.result}"
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -108,6 +111,9 @@ resource "null_resource" "provision_group_vars_setup" {
 }
 
 resource "random_string" "string" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
   length  = 5
   special = false
   number  = false
@@ -118,8 +124,9 @@ resource "null_resource" "provision_ansible_run" {
   count      = length(local.ip_list)
 
   triggers = {
-    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.host_entries_join
+    trigger_ansible = var.run_ansible ? "" : "${random_string.string.result}"
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {

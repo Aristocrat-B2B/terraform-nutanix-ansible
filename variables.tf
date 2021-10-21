@@ -57,6 +57,11 @@ variable "host_entries" {
   default     = {}
 }
 
+variable "run_ansible" {
+  type    = bool
+  default = false
+}
+
 ###Ansible Code Directory Tree Structure Example
 #ansible/
 #├── elasticsearch - ##"Should Be Always equivalent to var.module_name"
