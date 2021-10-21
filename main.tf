@@ -115,7 +115,7 @@ resource "null_resource" "provision_group_vars_setup" {
 }
 
 resource "random_string" "string" {
-  triggers = {
+  keepers = {
     always_run = "${timestamp()}"
   }
   length  = 5
