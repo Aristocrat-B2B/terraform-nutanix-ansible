@@ -8,6 +8,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 <a name="unreleased"></a>
 ## [Unreleased]
 
+<a name="v1.0.8"></a>
+## [v1.0.8] - 2021-10-26
+Changed
+- Ansible Module now creates backup of existing ansible code`
+
 <a name="v1.0.7"></a>
 ## [v1.0.7] - 2021-10-20
 Changed

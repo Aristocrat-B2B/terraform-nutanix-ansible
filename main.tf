@@ -137,6 +137,7 @@ resource "null_resource" "provision_ansible_run" {
     inline = var.run_ansible ? [
       "cd /home/${var.ssh_user}/${var.module_name}; echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root",
       "rm -rf /home/${var.ssh_user}/${var.module_name}-${random_string.string.result}",
+      "find /home/${var.ssh_user} -maxdepth 1 -type d -regex .*/${var.module_name}-[A-Za-z]+[A-Za-z] -exec bash -c 'mv $1 $(dirname $1)/$(date -r $1 +%F%T | sed 's/[:,-]/_/g')_$(basename $1)' _ {} \;",
       "mv /home/${var.ssh_user}/${var.module_name} /home/${var.ssh_user}/${var.module_name}-${random_string.string.result}"
     ] : ["echo 'Ansible Run Is Disable'", "rm -rf /tmp/ansible_disable 2>/dev/null"]
     connection {
