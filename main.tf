@@ -16,7 +16,9 @@ resource "null_resource" "provision" {
   count = length(local.ip_list)
 
   triggers = {
-    vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    trigger_ansible = local.ansible_chksum
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -118,6 +120,13 @@ resource "random_string" "string" {
   keepers = {
     always_run = "${timestamp()}"
   }
+
+  triggers = {
+    trigger_ansible = local.ansible_chksum
+    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts           = local.host_entries_join
+  }
+
   length  = 5
   special = false
   number  = false
