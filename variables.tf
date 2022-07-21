@@ -59,7 +59,7 @@ variable "host_entries" {
 
 variable "run_ansible" {
   type    = bool
-  default = false
+  default = true
 }
 
 ###Ansible Code Directory Tree Structure Example

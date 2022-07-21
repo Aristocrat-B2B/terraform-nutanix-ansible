@@ -1,4 +1,3 @@
-
 locals {
   ip_list = [for ip in var.module_nic_list : ip.0["ip_endpoint_list"].0["ip"]]
   ip_join = join(",", local.ip_list)
@@ -10,6 +9,7 @@ locals {
   host_entries_join    = var.host_entries == {} ? "" : join(",", local.host_entries_list)
   group_var_tpl_stat   = var.group_vars_tpl ? null_resource.provision_group_vars_templating : null_resource.provision
   group_var_setup_stat = var.group_vars_tpl ? null_resource.provision_group_vars_setup : null_resource.provision_ansible_code_setup
+  ansible_chksum       = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
 }
 
 resource "null_resource" "provision" {
@@ -35,7 +35,7 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    trigger_ansible = var.run_ansible ? "${random_string.string.result}" : ""
+    trigger_ansible = local.ansible_chksum
     vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     hosts           = local.host_entries_join
   }
@@ -56,7 +56,7 @@ resource "null_resource" "provision_ansible_code_setup" {
   count      = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = var.run_ansible ? "${random_string.string.result}" : ""
+    trigger_ansible = local.ansible_chksum
     vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     hosts           = local.host_entries_join
   }
@@ -96,7 +96,7 @@ resource "null_resource" "provision_group_vars_setup" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    trigger_ansible = var.run_ansible ? "${random_string.string.result}" : ""
+    trigger_ansible = local.ansible_chksum
     vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     hosts           = local.host_entries_join
   }
@@ -128,7 +128,7 @@ resource "null_resource" "provision_ansible_run" {
   count      = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = var.run_ansible ? "${random_string.string.result}" : ""
+    trigger_ansible = local.ansible_chksum
     vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     hosts           = local.host_entries_join
   }
