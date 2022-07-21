@@ -118,10 +118,7 @@ resource "null_resource" "provision_group_vars_setup" {
 
 resource "random_string" "string" {
   keepers = {
-    always_run = "${timestamp()}"
-  }
-
-  triggers = {
+    #always_run = "${timestamp()}"
     trigger_ansible = local.ansible_chksum
     vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     hosts           = local.host_entries_join
