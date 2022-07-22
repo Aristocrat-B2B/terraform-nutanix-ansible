@@ -133,9 +133,9 @@ resource "null_resource" "provision_group_vars_setup" {
 }
 
 resource "random_string" "string" {
-  keepers = {
-    always_run = "${timestamp()}"
-  }
+  #  keepers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   length  = 5
   special = false
