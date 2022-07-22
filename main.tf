@@ -114,9 +114,9 @@ resource "null_resource" "provision_group_vars_setup" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    trigger_ansible = local.ansible_chksum
-    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts           = local.host_entries_join
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
   }
 
   provisioner "remote-exec" {
@@ -147,9 +147,9 @@ resource "null_resource" "provision_ansible_run" {
   count      = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = local.ansible_chksum
-    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts           = local.host_entries_join
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
   }
 
   provisioner "remote-exec" {
