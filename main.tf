@@ -25,9 +25,9 @@ resource "null_resource" "provision" {
   count = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
-    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
-    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
     #vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
   }
 
@@ -47,9 +47,9 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
-    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
-    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
     #trigger_ansible = local.ansible_chksum
     #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     #hosts           = local.host_entries_join
@@ -71,9 +71,9 @@ resource "null_resource" "provision_ansible_code_setup" {
   count      = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
-    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
-    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
     #trigger_ansible = local.ansible_chksum
     #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
     #hosts           = local.host_entries_join
