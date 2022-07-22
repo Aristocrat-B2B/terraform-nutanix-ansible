@@ -9,7 +9,6 @@ locals {
   host_entries_join    = var.host_entries == {} ? "" : join(",", local.host_entries_list)
   group_var_tpl_stat   = var.group_vars_tpl ? null_resource.provision_group_vars_templating : null_resource.provision
   group_var_setup_stat = var.group_vars_tpl ? null_resource.provision_group_vars_setup : null_resource.provision_ansible_code_setup
-  ansible_chksum       = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
 }
 
 data "null_data_source" "ansible_code_changed" {
@@ -50,9 +49,6 @@ resource "null_resource" "provision_group_vars_templating" {
     trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
     vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
     hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
-    #trigger_ansible = local.ansible_chksum
-    #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    #hosts           = local.host_entries_join
   }
 
   provisioner "local-exec" {
@@ -74,9 +70,6 @@ resource "null_resource" "provision_ansible_code_setup" {
     trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
     vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
     hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
-    #trigger_ansible = local.ansible_chksum
-    #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    #hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {
@@ -133,9 +126,10 @@ resource "null_resource" "provision_group_vars_setup" {
 }
 
 resource "random_string" "string" {
-  #  keepers = {
-  #  always_run = "${timestamp()}"
-  #}
+  keepers = {
+    #  always_run = "${timestamp()}"
+    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
+  }
 
   length  = 5
   special = false
