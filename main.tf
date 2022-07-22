@@ -12,13 +12,23 @@ locals {
   ansible_chksum       = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
 }
 
+data "null_data_source" "ansible_code_changed" {
+  inputs = {
+    ansible_chksum = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
+
+    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    hosts = local.host_entries_join
+  }
+}
+
 resource "null_resource" "provision" {
   count = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = local.ansible_chksum
-    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts           = local.host_entries_join
+    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    #vars = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
   }
 
   provisioner "remote-exec" {
@@ -37,9 +47,12 @@ resource "null_resource" "provision_group_vars_templating" {
   count      = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
-    trigger_ansible = local.ansible_chksum
-    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts           = local.host_entries_join
+    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    #trigger_ansible = local.ansible_chksum
+    #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    #hosts           = local.host_entries_join
   }
 
   provisioner "local-exec" {
@@ -58,9 +71,12 @@ resource "null_resource" "provision_ansible_code_setup" {
   count      = length(local.ip_list)
 
   triggers = {
-    trigger_ansible = local.ansible_chksum
-    vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts           = local.host_entries_join
+    trigger_ansible = data.null_data_source.ansible_code_changed.values.outputs["ansible_chksum"]
+    vars            = data.null_data_source.ansible_code_changed.values.outputs["vars"]
+    hosts           = data.null_data_source.ansible_code_changed.values.outputs["hosts"]
+    #trigger_ansible = local.ansible_chksum
+    #vars            = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
+    #hosts           = local.host_entries_join
   }
 
   provisioner "remote-exec" {
