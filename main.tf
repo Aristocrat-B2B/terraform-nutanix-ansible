@@ -15,8 +15,8 @@ data "null_data_source" "ansible_code_changed" {
   inputs = {
     ansible_chksum = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
 
-    vars  = join(",", [for key, value in var.environment_variables : "${key}=${value}"])
-    hosts = local.host_entries_join
+    vars  = sha1(join(",", [for key, value in var.environment_variables : "${key}=${value}"]))
+    hosts = sha1(local.host_entries_join)
   }
 }
 
