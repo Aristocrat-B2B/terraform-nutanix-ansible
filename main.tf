@@ -18,7 +18,13 @@ data "null_data_source" "ansible_code_changed" {
 }
 
 # Set up group vars and inventories files for all nodes
-resource "null_resource" "provision_group_vars_templating" {
+# # Run ansible when vars, hosts or ansible code has changed
+# If vars, hosts, ansible_code has changed {
+#   rm /home/nutanix/haproxy
+#   cp local_ansible_code /home/nutanix/haproxy
+#   run ansible
+# fi
+resource "null_resource" "copy_and_run_ansible" {
   count = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
@@ -35,24 +41,6 @@ resource "null_resource" "provision_group_vars_templating" {
     command = "envsubst < ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}.tpl > ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}"
 
     environment = merge(var.environment_variables, { IP_ADDRESS = local.ip_list[count.index], priority_count = count.index })
-  }
-}
-
-# Run ansible when vars, hosts or ansible code has changed
-# If vars, hosts, ansible_code has changed {
-#   rm /home/nutanix/haproxy
-#   cp local_ansible_code /home/nutanix/haproxy
-#   run ansible
-# fi
-resource "null_resource" "copy_and_run_ansible" {
-  depends_on = [null_resource.provision_group_vars_templating]
-  count      = length(local.ip_list) # Run on all nodes of same type
-
-  # Only run if vars, hosts or ansible code has changed
-  triggers = {
-    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
-    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
-    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
   }
 
   # Removes remote ansible files from node
