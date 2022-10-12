@@ -8,7 +8,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 <a name="unreleased"></a>
 ## [Unreleased]
 
-<a name="v1.0.9"></a>
+<a name="v1.0.10"></a>
 ## [v1.0.10] - 2022-07-20
 Changed
 - Simplified the Ansible module
