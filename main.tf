@@ -59,6 +59,7 @@ resource "null_resource" "copy_and_run_ansible" {
   provisioner "remote-exec" {
     inline = [
       "rm -rf /home/${var.ssh_user}/${var.module_name}",
+      "mkdir -p /home/${var.ssh_user}/${var.module_name}",
     ]
 
     connection {
