@@ -74,7 +74,9 @@ resource "null_resource" "copy_and_run_ansible" {
   # Now run ansible
   provisioner "remote-exec" {
     inline = [
-      "cd /home/${var.ssh_user}/${var.module_name} && echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root"
+      "cp /home/${var.ssh_user}/${var.module_name}/${var.group_vars_name}-${count.index} /home/${var.ssh_user}/${var.module_name}/${var.group_vars_name}",
+      "cd /home/${var.ssh_user}/${var.module_name}",
+      "echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root"
     ]
 
     connection {
