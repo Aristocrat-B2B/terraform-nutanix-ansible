@@ -46,7 +46,7 @@ resource "null_resource" "copy_and_run_ansible" {
   # Removes remote ansible files from node
   provisioner "remote-exec" {
     inline = [
-      "rm -rf /home/${var.ssh_user}/${var.module_name}",
+      "echo '${var.ssh_password}' | sudo -S rm -rf /home/${var.ssh_user}/${var.module_name}",
       "mkdir -p /home/${var.ssh_user}/${var.module_name}",
     ]
 
@@ -74,7 +74,8 @@ resource "null_resource" "copy_and_run_ansible" {
   # Now run ansible
   provisioner "remote-exec" {
     inline = [
-      "cp /home/${var.ssh_user}/${var.module_name}/${var.group_vars_name}-${count.index} /home/${var.ssh_user}/${var.module_name}/${var.group_vars_name}",
+
+      "cp /home/${var.ssh_user}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index} /home/${var.ssh_user}/${var.module_name}/inventories/group_vars/${var.group_vars_name}",
       "cd /home/${var.ssh_user}/${var.module_name}",
       "echo '${var.ssh_password}' | sudo -S ansible-playbook configure_${var.module_name}.yml -i inventories/${var.module_name}host -b --become-user=root"
     ]
