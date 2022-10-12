@@ -9,10 +9,14 @@ project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 <a name="v1.0.9"></a>
+## [v1.0.10] - 2022-07-20
+Changed
+- Simplified the Ansible module
+
+<a name="v1.0.9"></a>
 ## [v1.0.9] - 2022-07-20
 Changed
 - Ansible Module now only runs ansible code when its actually changed
-
 
 <a name="v1.0.8"></a>
 ## [v1.0.8] - 2021-10-26
