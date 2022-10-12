@@ -1,6 +1,8 @@
 locals {
   ip_list = [for ip in var.module_nic_list : ip.0["ip_endpoint_list"].0["ip"]]
+  ip_join = join(",", local.ip_list)
 
+  host_join = join(",", var.module_vms)
   host_entries_list = var.host_entries == {} ? [] : [for host, ip in var.host_entries :
   "${host}=${ip}"]
   host_entries_join = var.host_entries == {} ? "" : join(",", local.host_entries_list)
