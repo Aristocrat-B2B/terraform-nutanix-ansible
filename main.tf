@@ -19,8 +19,7 @@ data "null_data_source" "ansible_code_changed" {
 
 # Set up group vars and inventories files for all nodes
 resource "null_resource" "provision_group_vars_templating" {
-  depends_on = [null_resource.provision]
-  count      = var.group_vars_tpl ? length(local.ip_list) : 0
+  count = var.group_vars_tpl ? length(local.ip_list) : 0
 
   triggers = {
     trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
