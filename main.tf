@@ -17,6 +17,45 @@ data "null_data_source" "ansible_code_changed" {
   }
 }
 
+resource "null_resource" "create_ansible_user" {
+  count = var.group_vars_tpl ? length(local.ip_list) : 0
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'nutanix' | sudo -S useradd -m -g sudo -c 'Service Account for Ansible' -s /bin/bash -p $(echo '${var.ssh_password}' | openssl passwd -1 -stdin) ${var.ssh_user}"
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = "nutanix"
+      password = "nutanix"
+      host     = local.ip_list[count.index]
+    }
+  }
+}
+
+resource "null_resource" "lock_nutanix_user" {
+  count = var.group_vars_tpl ? length(local.ip_list) : 0
+
+  depends_on = [
+    null_resource.create_ansible_user
+  ]
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo '${var.ssh_password}' | sudo -S usermod -L nutanix",
+      "echo '${var.ssh_password}' | sudo -S usermod -s /sbin/nologin nutanix"
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = var.ssh_user
+      password = var.ssh_password
+      host     = local.ip_list[count.index]
+    }
+  }
+}
+
 # Set up group vars and inventories files for all nodes
 # # Run ansible when vars, hosts or ansible code has changed
 # If vars, hosts, ansible_code has changed {
@@ -26,6 +65,10 @@ data "null_data_source" "ansible_code_changed" {
 # fi
 resource "null_resource" "copy_and_run_ansible" {
   count = var.group_vars_tpl ? length(local.ip_list) : 0
+
+  depends_on = [
+    null_resource.lock_nutanix_user
+  ]
 
   triggers = {
     trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
