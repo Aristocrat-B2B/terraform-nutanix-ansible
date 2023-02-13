@@ -62,6 +62,12 @@ variable "run_ansible" {
   default = true
 }
 
+variable "lock_nutanix_user" {
+  type        = bool
+  default     = true
+  description = "Defines whether default nutanix user will be locked and the new one created"
+}
+
 ###Ansible Code Directory Tree Structure Example
 #ansible/
 #├── elasticsearch - ##"Should Be Always equivalent to var.module_name"

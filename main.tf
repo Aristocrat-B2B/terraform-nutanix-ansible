@@ -18,7 +18,7 @@ data "null_data_source" "ansible_code_changed" {
 }
 
 resource "null_resource" "create_ansible_user" {
-  count = var.group_vars_tpl ? length(local.ip_list) : 0
+  count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
   provisioner "remote-exec" {
     inline = [
@@ -35,7 +35,7 @@ resource "null_resource" "create_ansible_user" {
 }
 
 resource "null_resource" "lock_nutanix_user" {
-  count = var.group_vars_tpl ? length(local.ip_list) : 0
+  count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
   depends_on = [
     null_resource.create_ansible_user
