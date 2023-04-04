@@ -20,6 +20,10 @@ data "null_data_source" "ansible_code_changed" {
 resource "null_resource" "create_ansible_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
+  triggers = {
+    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
+  }
+
   provisioner "remote-exec" {
     inline = [
       "echo 'nutanix' | sudo -S useradd -m -g sudo -c 'Service Account for Ansible' -s /bin/bash -p $(echo '${var.ssh_password}' | openssl passwd -1 -stdin) ${var.ssh_user}"
@@ -36,6 +40,10 @@ resource "null_resource" "create_ansible_user" {
 
 resource "null_resource" "lock_nutanix_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
+
+  triggers = {
+    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
+  }
 
   depends_on = [
     null_resource.create_ansible_user
