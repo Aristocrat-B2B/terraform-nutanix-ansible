@@ -17,35 +17,8 @@ data "null_data_source" "ansible_code_changed" {
   }
 }
 
-resource "null_resource" "check_nutanix_user_ssh_works" {
-
-  triggers = {
-    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
-  }
-
-  # Simple remote-exec provisioner just to check if you can ssh using the 'nutanix' user
-  provisioner "remote-exec" {
-    inline = [
-      "true"
-    ]
-    on_failure = continue
-
-    connection {
-      type     = "ssh"
-      user     = "nutanix"
-      password = "nutanix"
-      host     = local.ip_list[count.index]
-      timeout  = "2m"
-    }
-  }
-}
-
 resource "null_resource" "create_ansible_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
-
-  triggers = {
-    need_to_create_ansible_user = null_resource.check_nutanix_user_ssh_works
-  }
 
   provisioner "remote-exec" {
     inline = [
@@ -64,10 +37,6 @@ resource "null_resource" "create_ansible_user" {
 resource "null_resource" "lock_nutanix_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
-  triggers = {
-    lock_nutanix_user = null_resource.create_ansible_user
-  }
-
   depends_on = [
     null_resource.create_ansible_user
   ]
@@ -77,7 +46,6 @@ resource "null_resource" "lock_nutanix_user" {
       "echo '${var.ssh_password}' | sudo -S usermod -L nutanix",
       "echo '${var.ssh_password}' | sudo -S usermod -s /sbin/nologin nutanix"
     ]
-    on_failure = continue
 
     connection {
       type     = "ssh"
