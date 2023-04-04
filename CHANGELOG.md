@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](http://semver.org/).
 
+<a name="v1.0.99"></a>
+## [v1.0.12] - 2023-02-13
+Changed
+- Make `nutanix` user lock optional
+
 <a name="v1.0.12"></a>
 ## [v1.0.12] - 2023-02-13
 Changed
