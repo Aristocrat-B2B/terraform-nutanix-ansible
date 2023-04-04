@@ -20,9 +20,9 @@ data "null_data_source" "ansible_code_changed" {
 resource "null_resource" "create_ansible_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
-  triggers = {
-    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
-  }
+  #  triggers = {
+  #    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
+  #  }
 
   provisioner "remote-exec" {
     inline = [
@@ -41,9 +41,9 @@ resource "null_resource" "create_ansible_user" {
 resource "null_resource" "lock_nutanix_user" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
-  triggers = {
-    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
-  }
+  #  triggers = {
+  #    hosts = data.null_data_source.ansible_code_changed.outputs["hosts"]
+  #  }
 
   depends_on = [
     null_resource.create_ansible_user
@@ -54,6 +54,7 @@ resource "null_resource" "lock_nutanix_user" {
       "echo '${var.ssh_password}' | sudo -S usermod -L nutanix",
       "echo '${var.ssh_password}' | sudo -S usermod -s /sbin/nologin nutanix"
     ]
+    on_failure = continue
 
     connection {
       type     = "ssh"
