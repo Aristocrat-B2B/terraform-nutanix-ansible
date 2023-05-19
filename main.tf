@@ -1,57 +1,29 @@
 locals {
-  ip_list = [for ip in var.module_nic_list : ip.0["ip_endpoint_list"].0["ip"]]
-  ip_join = join(",", local.ip_list)
-
-  host_join = join(",", var.module_vms)
-  host_entries_list = var.host_entries == {} ? [] : [for host, ip in var.host_entries :
-  "${host}=${ip}"]
-  host_entries_join = var.host_entries == {} ? "" : join(",", local.host_entries_list)
+  ip_list = values(var.host_entries)[*].ip
 }
 
 data "null_data_source" "ansible_code_changed" {
   inputs = {
     ansible_chksum = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
-
-    vars  = sha1(join(",", [for key, value in var.environment_variables : "${key}=${value}"]))
-    hosts = sha1(local.host_entries_join)
+    vars           = sha1(join(",", [for key, value in var.environment_variables : "${key}=${value}"]))
+    hosts          = sha1(jsonencode(var.host_entries))
   }
 }
 
-resource "null_resource" "create_ansible_user" {
+resource "null_resource" "ensure_nutanix_user_locked_and_ansible_user_created" {
   count = var.lock_nutanix_user ? length(local.ip_list) : 0
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo 'nutanix' | sudo -S useradd -m -g sudo -c 'Service Account for Ansible' -s /bin/bash -p $(echo '${var.ssh_password}' | openssl passwd -1 -stdin) ${var.ssh_user}"
-    ]
-
-    connection {
-      type     = "ssh"
-      user     = "nutanix"
-      password = "nutanix"
-      host     = local.ip_list[count.index]
-    }
+  triggers = {
+    hosts = "${sha1(jsonencode(var.host_entries))}"
   }
-}
 
-resource "null_resource" "lock_nutanix_user" {
-  count = var.lock_nutanix_user ? length(local.ip_list) : 0
+  provisioner "local-exec" {
+    command     = "${path.module}/lock_nutanix_user.sh ${local.ip_list[count.index]}"
+    interpreter = ["bash", "-c"]
 
-  depends_on = [
-    null_resource.create_ansible_user
-  ]
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo '${var.ssh_password}' | sudo -S usermod -L nutanix",
-      "echo '${var.ssh_password}' | sudo -S usermod -s /sbin/nologin nutanix"
-    ]
-
-    connection {
-      type     = "ssh"
-      user     = var.ssh_user
-      password = var.ssh_password
-      host     = local.ip_list[count.index]
+    environment = {
+      SSH_USER     = var.ssh_user
+      SSH_PASSWORD = var.ssh_password
     }
   }
 }
@@ -67,7 +39,7 @@ resource "null_resource" "copy_and_run_ansible" {
   count = var.group_vars_tpl ? length(local.ip_list) : 0
 
   depends_on = [
-    null_resource.lock_nutanix_user
+    null_resource.ensure_nutanix_user_locked_and_ansible_user_created
   ]
 
   triggers = {

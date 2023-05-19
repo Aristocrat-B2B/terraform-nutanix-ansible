@@ -3,16 +3,6 @@ variable "module_name" {
   description = "Name of VM Creation Module"
 }
 
-variable "module_nic_list" {
-  type        = list(any)
-  description = "Network Interface Output(nic_list) from VM Creation Module(Supported - Aristocrat-B2B/virtualmachine/nutanix)"
-}
-
-variable "module_vms" {
-  type        = list(any)
-  description = "VM Name Output(vm_name) from VM Creation Module(Supported - Aristocrat-B2B/virtualmachine/nutanix)"
-}
-
 variable "ansible_path" {
   type        = string
   description = "Path to Ansible Code Directory"
@@ -53,7 +43,7 @@ variable "environment_variables" {
 
 variable "host_entries" {
   type        = map(any)
-  description = "Map of hostname(key) and IP(value)"
+  description = "Map which describes hosts where ansible should be executed. Format: { host_name: { id = 'unique host id' ip = '1.2.3.4' }}"
   default     = {}
 }
 

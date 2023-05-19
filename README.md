@@ -30,8 +30,7 @@ module "testvm_ansible" {
   source          = "Aristocrat-B2B/ansible/nutanix"
   version         = "1.0.0"
   module_name     = "testvm"
-  module_nic_list = module.testvm.nic_list
-  module_vms      = module.testvm.vms
+  host_entries    = module.testvm.host_inventory
   ansible_path    = var.ansible_path
   group_vars_tpl  = true
   group_vars_name = "localhostservers"
@@ -40,8 +39,8 @@ module "testvm_ansible" {
   ssh_password    = var.ssh_password
 
   environment_variables = {
-  hostname = var.hostname
-  services = var.services
+    hostname = var.hostname
+    services = var.services
   }
 }
 

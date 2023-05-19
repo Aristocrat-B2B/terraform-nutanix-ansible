@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this
 project adheres to [Semantic Versioning](http://semver.org/).
 
+<a name="v2.0.0"></a>
+## [v2.0.0] - 2023-05-19
+Changed
+- Improve `nutanix` user lock approach to cover cases when a virtual host is being re-created
+- Delete all outputs as they were the same data as the one passed outside through variables but formatted differently. It should not be a responsibility of this module.
+- Refactored locals usage. Deleted unnecessary
+- Deleted vars:
+  - `module_nic_list` - we'll rely on updated `host_entries`
+  - `module_vms` - it was never used
+
+- `host_entries`: now expects following structure:
+```
+  {
+    host_name = {
+      id = "unique host id"
+      ip = "1.2.3.4"
+    }
+  }
+```
+
 <a name="v1.0.12"></a>
 ## [v1.0.12] - 2023-02-13
 Changed
