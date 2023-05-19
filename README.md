@@ -9,7 +9,7 @@ The ansible module is meant to be used with [Aristocrat-B2B/virtualmachine/nutan
 ```hcl
 module "testvm" {
   source = "Aristocrat-B2B/virtualmachine/nutanix"
-  version = "1.0.5"
+  version = "2.0.0"
   subnet_name          = var.subnet_name
   nutanix_cluster_name = var.nutanix_cluster_name"
   vm_name              = ["ansible-testvm-node-1", "ansible-testvm-node-2"]
@@ -28,7 +28,7 @@ module "testvm" {
 module "testvm_ansible" {
   depends_on      = [module.testvm]
   source          = "Aristocrat-B2B/ansible/nutanix"
-  version         = "1.0.0"
+  version         = "2.0.0"
   module_name     = "testvm"
   host_entries    = module.testvm.host_inventory
   ansible_path    = var.ansible_path
