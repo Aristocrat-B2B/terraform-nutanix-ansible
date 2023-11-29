@@ -2,12 +2,16 @@ locals {
   ip_list = values(var.host_entries)[*].ip
 }
 
-data "null_data_source" "ansible_code_changed" {
-  inputs = {
-    ansible_chksum = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
-    vars           = sha1(join(",", [for key, value in var.environment_variables : "${key}=${value}"]))
-    hosts          = sha1(jsonencode(var.host_entries))
-  }
+resource "terraform_data" "ansible_checksum" {
+  input = sha1(join("", [for f in fileset("${var.ansible_path}/${var.module_name}/", "**") : filesha1("${var.ansible_path}/${var.module_name}/${f}")]))
+}
+
+resource "terraform_data" "ansible_vars" {
+  input = sha1(join(",", [for key, value in var.environment_variables : "${key}=${value}"]))
+}
+
+resource "terraform_data" "ansible_hosts" {
+  inputs = sha1(jsonencode(var.host_entries))
 }
 
 resource "null_resource" "ensure_nutanix_user_locked_and_ansible_user_created" {
@@ -42,11 +46,11 @@ resource "null_resource" "copy_and_run_ansible" {
     null_resource.ensure_nutanix_user_locked_and_ansible_user_created
   ]
 
-  triggers = {
-    trigger_ansible = data.null_data_source.ansible_code_changed.outputs["ansible_chksum"]
-    vars            = data.null_data_source.ansible_code_changed.outputs["vars"]
-    hosts           = data.null_data_source.ansible_code_changed.outputs["hosts"]
-  }
+  triggers_replace = [
+    terraform_data.ansible_checksum,
+    terraform_data.ansible_vars,
+    terraform_data.ansible_hosts,
+  ]
 
   provisioner "local-exec" {
     command = "cp ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}.tpl ${var.ansible_path}/${var.module_name}/inventories/group_vars/${var.group_vars_name}-${count.index}.tpl"
